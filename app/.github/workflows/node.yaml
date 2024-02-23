@@ -1,0 +1,97 @@
+name: build
+
+on: 
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+
+      # Install dependencies
+      - run: npm ci
+
+      # Build and output webpack stats to artifacts/webpack-stats.json
+      - run: npm run build -- --json webpack-stats.json
+
+      # Send webpack stats and build information to RelativeCI
+      - name: Send webpack stats to RelativeCI
+        uses: relative-ci/agent-action@v1.1.3
+        with:
+          webpackStatsFile: ./webpack-stats.json
+          key: ${{ secrets.RELATIVE_CI_KEY }}
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-artifacts
+          path: |
+            webpack-stats.json
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: ./dist
+
+  preview:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+    needs: build
+    # Skip running on dependabot/.* branches
+    if: contains(github.ref, 'dependabot') != true
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: build
+          path: public
+
+      - name: Display structure of downloaded files
+        run: ls -R
+
+      - uses: chrnorm/deployment-action@releases/v1
+        name: Create GitHub deployment
+        id: deployment
+        with:
+          token: ${{ github.token }}
+          environment: preview
+
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        id: deploy
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+          # expires: 7d
+          # projectId: relative-ci - .firebaserc provided
+          channelId: preview
+
+      # Update deployment status
+      - name: Update deployment status (success)
+        if: success()
+        uses: chrnorm/deployment-status@releases/v1
+        with:
+          token: ${{ github.token }}
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+          target_url: ${{ steps.deploy.outputs.details_url }}
+          environment_url: ${{ steps.deploy.outputs.details_url }}
+          environment: preview
+          state: success
+
+      - name: Update deployment status (failure)
+        if: failure()
+        uses: chrnorm/deployment-status@releases/v1
+        with:
+          token: ${{ github.token }}
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+          environment: preview
+          state: failure
