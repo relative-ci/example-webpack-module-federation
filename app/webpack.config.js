@@ -79,6 +79,7 @@ module.exports = {
     new RelativeCiAgentWebpackPlugin(),
   ],
   stats: {
+    preset: 'errors-only',
     assets: true,
     modules: true,
     excludeAssets: [/bundle-stats.html/, /webpack-stats/],
