@@ -78,7 +78,13 @@ module.exports = {
     }),
     new RelativeCiAgentWebpackPlugin(),
   ],
-  stats: 'errors-only',
+  stats: {
+    errors: false,
+    warnings: false,
+    assets: true,
+    modules: true,
+    excludeAssets: [/bundle-stats.html/, /webpack-stats/],
+  },
   devServer: {
     historyApiFallback: true,
   },
