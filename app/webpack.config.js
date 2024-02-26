@@ -4,6 +4,7 @@ const HtmlPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { BundleStatsWebpackPlugin } = require('bundle-stats-webpack-plugin');
 const { StatsWriterPlugin } = require('webpack-stats-plugin');
+const { RelativeCiAgentWebpackPlugin } = require('@relative-ci/agent');
 
 const SRC_DIR = path.resolve(__dirname, 'src');
 const OUT_DIR = path.resolve(__dirname, 'dist');
@@ -75,8 +76,11 @@ module.exports = {
         classnames: { singleton: true, eager: true },
       },
     }),
+    new RelativeCiAgentWebpackPlugin(),
   ],
   stats: {
+    errors: false,
+    warnings: false,
     assets: true,
     modules: true,
     excludeAssets: [/bundle-stats.html/, /webpack-stats/],

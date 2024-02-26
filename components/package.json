@@ -24,7 +24,7 @@
     "eslint-config-airbnb": "^19.0.4",
     "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^2.5.3",
-    "webpack": "^5.76.3",
+    "webpack": "5.76.3",
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.15.1",
     "webpack-stats-plugin": "^1.1.3"

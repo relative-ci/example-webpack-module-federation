@@ -30,6 +30,10 @@ jobs:
       # Build and output webpack stats to artifacts/webpack-stats.json
       - run: npm run build 
         working-directory: app
+        env:
+          RELATIVE_CI_KEY: ${{ secrets.RELATIVE_CI_KEY }}
+          RELATIVE_CI_SLUG: "relative-ci/incorrect-slug"
+          DEBUG: relative-ci:agent
 
       - name: Archive production artifacts
         uses: actions/upload-artifact@v2
