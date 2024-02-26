@@ -15,7 +15,7 @@
     "@babel/core": "^7.17.0",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
-    "@relative-ci/agent": "4.1.5",
+    "@relative-ci/agent": "^4.2.6-beta.0",
     "babel-loader": "^8.2.3",
     "bundle-stats": "^4.12.0-beta.3",
     "bundle-stats-webpack-plugin": "^4.12.0-beta.3",
